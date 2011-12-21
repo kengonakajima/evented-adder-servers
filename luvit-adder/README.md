@@ -1,10 +1,10 @@
 simplest TCP server performance test
 =====================
 
- 1. start addsv.lua  (server process)
- 2. start addcl.lua  (client process)
+ 1. luvit addsv.lua  (server process)
+ 2. luvit addcl.lua  (client process)
 
- addcl creates many TCP connections to addsv, and counts total query/sec :
+ addcl.lua creates many TCP connections to addsv.lua, and it counts total query/sec :
 
 "consumed time:"	26.71	" avg:"	37439.161362785	" q/sec"
 

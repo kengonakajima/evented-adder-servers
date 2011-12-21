@@ -15,8 +15,11 @@ simplest TCP server performance test
  This is a skeleton program of simplest RPC server and you can see
  how is the baseline of performance as a RPC server.
  By adding byte stream parser and some RPC routing, you will get more overhead from it.
+ You can compare the result with nonet.lua, that doesn't do any network things.
+ 
+ In my macbook pro (i5 2.53GHz), addsv-addcl pair can call about 36K query/sec,
+ and nonet.lua averages 25M query/sec.
 
- In my macbook pro (i5 2.53GHz), it can call about 36K query/sec.
-
+ Now I'm wondering  500K or 1M q/sec is possible or not on luvit.
  
  

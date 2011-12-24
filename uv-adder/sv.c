@@ -22,28 +22,28 @@ typedef struct {
 
 
 uv_loop_t* loop;
-uv_tcp_t tcpEchoServer;
-uv_handle_t* echoServer;
+uv_tcp_t tcpAdderServer;
+uv_handle_t* adderServer;
 
 
 
 
 
-void echo_on_server_close(uv_handle_t* handle) {
-    assert(handle == echoServer);
+void adder_on_server_close(uv_handle_t* handle) {
+    assert(handle == adderServer);
 }
 
-void echo_on_close(uv_handle_t* peer) {
+void adder_on_close(uv_handle_t* peer) {
     free(peer);
 }
 
-void echo_after_shutdown(uv_shutdown_t* req, int status) {
-    uv_close((uv_handle_t*)req->handle, echo_on_close);
+void adder_after_shutdown(uv_shutdown_t* req, int status) {
+    uv_close((uv_handle_t*)req->handle, adder_on_close);
     free(req);
 }
 
 
-void echo_after_write(uv_write_t* req, int status) {
+void adder_after_write(uv_write_t* req, int status) {
     if (status) {
         uv_err_t err = uv_last_error(loop);
         fprintf(stderr, "uv_write error: %s\n", uv_strerror(err));
@@ -72,7 +72,6 @@ void parser_add_data( parser_t *p, char *buf, ssize_t nr ){
         line[i]=p->buf[i];
         if(p->buf[i]=='\n'){
             line[i]='\0';
-            fprintf(stderr, "found line: %s\n", line);
             break;
         }
     }
@@ -89,7 +88,7 @@ void parser_add_data( parser_t *p, char *buf, ssize_t nr ){
 
         uv_write_t *wr = malloc(sizeof(uv_write_t));
         uv_buf_t buf = uv_buf_init( retstr,strlen(retstr));
-        if( uv_write( wr, (uv_stream_t*) &cli->handle, &buf, 1, echo_after_write ) ){
+        if( uv_write( wr, (uv_stream_t*) &cli->handle, &buf, 1, adder_after_write ) ){
             assert(!"uv_write fail");
         }
     }
@@ -102,7 +101,7 @@ void dump(char*p,size_t n){
     }    
 }
 
-void echo_after_read(uv_stream_t* handle, ssize_t nread, uv_buf_t buf) {
+void adder_after_read(uv_stream_t* handle, ssize_t nread, uv_buf_t buf) {
     cli_t *cli = handle->data;
     int i;
 
@@ -114,7 +113,7 @@ void echo_after_read(uv_stream_t* handle, ssize_t nread, uv_buf_t buf) {
             free(buf.base);
         }
         req = (uv_shutdown_t*) malloc(sizeof *req);
-        uv_shutdown(req, handle, echo_after_shutdown);
+        uv_shutdown(req, handle, adder_after_shutdown);
 
         return;
     }
@@ -128,16 +127,16 @@ void echo_after_read(uv_stream_t* handle, ssize_t nread, uv_buf_t buf) {
     free(buf.base);
 }
 
-uv_buf_t echo_alloc(uv_handle_t* handle, size_t suggested_size) {
+uv_buf_t adder_alloc(uv_handle_t* handle, size_t suggested_size) {
     //    fprintf(stderr, "suggested_size: %d\n", (int)suggested_size );
     return uv_buf_init(malloc(suggested_size), suggested_size);
 }
 
 
-void echo_on_connection(uv_stream_t* server, int status) {
+void adder_on_connection(uv_stream_t* server, int status) {
     cli_t* cli;
     int r;
-    fprintf(stderr, "echo ");
+    fprintf(stderr, "adder ");
 
     if (status != 0) {
         fprintf(stderr, "Connect error %d\n",uv_last_error(loop).code);
@@ -158,31 +157,31 @@ void echo_on_connection(uv_stream_t* server, int status) {
     r = uv_accept(server, (uv_stream_t*) & cli->handle );
     assert(r == 0);
 
-    r = uv_read_start( (uv_stream_t*) & cli->handle, echo_alloc, echo_after_read);
+    r = uv_read_start( (uv_stream_t*) & cli->handle, adder_alloc, adder_after_read);
     assert(r == 0);
 }
 
 
-void startEchoServer(uv_loop_t*loop)
+void startAdderServer(uv_loop_t*loop)
 {
     struct sockaddr_in addr = uv_ip4_addr("0.0.0.0", 8080);
     int r;
 
-    echoServer = (uv_handle_t*)&tcpEchoServer;
+    adderServer = (uv_handle_t*)&tcpAdderServer;
 
-    r = uv_tcp_init(loop, &tcpEchoServer);
+    r = uv_tcp_init(loop, &tcpAdderServer);
     if (r) {
         fprintf(stderr, "Socket creation error\n");
         return;
     }
 
-    r = uv_tcp_bind(&tcpEchoServer, addr);
+    r = uv_tcp_bind(&tcpAdderServer, addr);
     if (r) {
         fprintf(stderr, "Bind error\n");
         return;
     }
 
-    r = uv_listen((uv_stream_t*)&tcpEchoServer, SOMAXCONN, echo_on_connection);
+    r = uv_listen((uv_stream_t*)&tcpAdderServer, SOMAXCONN, adder_on_connection);
     if (r) {
         fprintf(stderr, "Listen error %s\n", uv_err_name(uv_last_error(loop)));
         return;
@@ -192,7 +191,7 @@ void startEchoServer(uv_loop_t*loop)
 int main(int argc, char **argv )
 {
     loop = uv_default_loop();
-    startEchoServer(loop);
+    startAdderServer(loop);
     uv_run(loop);
     return 0;
 

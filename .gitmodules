@@ -1,0 +1,3 @@
+[submodule "uv-adder/deps/libuv"]
+	path = uv-adder/deps/libuv
+	url = https://github.com/joyent/libuv

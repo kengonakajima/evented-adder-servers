@@ -164,7 +164,7 @@ void adder_on_connection(uv_stream_t* server, int status) {
 
 void startAdderServer(uv_loop_t*loop)
 {
-    struct sockaddr_in addr = uv_ip4_addr("0.0.0.0", 8080);
+    struct sockaddr_in addr = uv_ip4_addr("0.0.0.0", 8090);
     int r;
 
     adderServer = (uv_handle_t*)&tcpAdderServer;

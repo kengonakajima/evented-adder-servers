@@ -28,8 +28,9 @@ see source code. it's dead simple.
 
 
 
-Performance summary (on OSX Lion i5 2.53GHz), concurrency:10 or 20
+Performance summary 
 ======
+OSX Lion i5 2.53GHz, concurrency:10 or 20.
 
 1. ev client to ev server (text): about 75K query/sec
 2. uv client to uv server (text) : about 70K query/sec

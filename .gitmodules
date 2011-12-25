@@ -1,3 +1,6 @@
 [submodule "uv-adder/deps/libuv"]
 	path = uv-adder/deps/libuv
 	url = https://github.com/joyent/libuv
+[submodule "ev-adder/deps/libev"]
+	path = ev-adder/deps/libev
+	url = https://github.com/brimworks/libev

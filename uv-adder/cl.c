@@ -6,10 +6,11 @@
 #include <strings.h>
 
 
-#define NSEND 10000
-#define NCONNETION 10
+#define NSEND 100000
+
 
 int nFinished=0;
+int nConnection;
 
 uv_loop_t *loop;
 
@@ -76,7 +77,7 @@ void after_read( uv_stream_t* tcp, ssize_t nread, uv_buf_t buf) {
         } else{
             fprintf(stderr, "finished:%d\n",ses->cnt);
             nFinished ++;
-            if( nFinished == NCONNETION ){
+            if( nFinished == nConnection){
                 exit(0);
             }
         }
@@ -89,7 +90,8 @@ void after_read( uv_stream_t* tcp, ssize_t nread, uv_buf_t buf) {
 
 
 
-void after_connect( uv_connect_t *req,  int status ) { 
+void after_connect( uv_connect_t *req,  int status ) {
+    fprintf(stderr,"after_connect:%d\n",status);
     int ret;
     
     uv_stream_t* tcp = req->handle;
@@ -129,9 +131,15 @@ ses_t *startSession() {
 
 int main( int argc, char **argv )
 {
+    if( argc != 2 ){
+        fprintf(stderr,"need arg(nConnection)\n");
+        return 1;
+    }
+    nConnection = atoi(argv[1]);
+    
     loop = uv_default_loop();
     int i;
-    for(i=0;i<NCONNETION;i++){
+    for(i=0;i<nConnection;i++){
         startSession();
     }
 
